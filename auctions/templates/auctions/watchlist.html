@@ -1,0 +1,16 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Watchlist</h2>
+
+    {% for item in watchListItems %}
+        <div class="comments">
+            <a href="{% url 'view-listing' item.idNumber %}"><button> {{ item.item }}</button><a>
+            <p>By {{ item.item.owner }}</p>
+        </div>
+    {% empty %}
+        <p>No items</p>
+
+        <img src="https://media.giphy.com/media/VIQfHC9jAZbt6ojTdo/giphy.gif" alt="" class="img-fluid">
+    {% endfor %}
+{% endblock %}

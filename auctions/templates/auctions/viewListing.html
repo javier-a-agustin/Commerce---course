@@ -1,0 +1,89 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div>
+        <h3>{{ item.title|upper }}</h3>
+
+        <br>
+
+        <div class="item-information">
+            <p><strong>Description:</strong> {{ item.description }}</p>
+            
+            {% if sameUser and item.active%}
+                <a href="{% url 'close-item' item.id %}"><button>Close auction</button></a>
+            {% endif %}
+
+            {% if user.is_authenticated and not sameUser%}
+                {% if watchlistItem %}                    
+                    <a href=" {% url 'watchlist' item.id %}"> <button>Remove from Watchlist</button> </a>
+                {% else %}
+                    <a href=" {% url 'watchlist' item.id %}"> <button>Add to Watchlist</button> </a>
+                {% endif %}
+            {% endif %}
+        </div>
+        <br>
+        <div id="items-container">
+            <div class="items">
+                {% if item.category %}
+                    <p><strong>Category:</strong> #{{ item.category }}</p>
+                {% endif %}
+                <p><strong>Current price:</strong> {{ item.currentBid }}</p>
+
+            </div>
+            <div class="items">
+                <img src="{{ item.imgUrl }}" alt="" class="img-fluid listing-img">    
+            </div>
+        </div>
+        
+    </div>
+    
+    {% if message %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }} ! Try again.
+        </div>
+        
+    {% endif %}
+
+    {% if item.winner == userLoged %}
+        <div class="alert alert-info" role="alert">
+            You won!
+        </div>
+    {% else %}
+        {% if user.is_authenticated and item.active%}
+            {% if sameUser %}
+                <br>
+            {% else %}
+                
+                <form class="form" action="{% url 'view-listing' item.id %}" method="POST">
+                    {% csrf_token %}
+                    {{ bidForm }}
+                    <br>
+                    <input type="submit" value="Send">
+                </form>
+                <br>
+            {% endif %}
+
+            <form class="form" action="{% url 'view-listing' item.id %}" method="POST">
+                {% csrf_token %}
+                {{ commentForm }}
+                <br>
+                <input type="submit" value="Send">
+            </form>
+
+        {% else %}
+            <p>You must be loged to comment</p>
+        {% endif %}
+        
+    {% endif %}
+    <br>
+    <div id="comments-container">
+        {% for comment in comments reversed %}
+            <div class="comments">
+                <p> <strong>{{ comment.name }}</strong> </p>
+                <p>{{ comment.content }}</p>
+                <p>{{ comment.date }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
